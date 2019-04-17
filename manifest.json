@@ -1,0 +1,30 @@
+{
+    "name": "Chrome Extension Tab Switcher",
+    "version": "1.0",
+    "description": "Monitoring ",
+    "manifest_version": 2,
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "options_page": "options.html",
+    "browser_action": {
+        "default_title": "Tab Switcher",
+        "default_icon": {
+            "16": "images/img16.png",
+            "32": "images/img32.png",
+            "48": "images/img48.png",
+            "128": "images/img128.png"
+        }
+    },
+    "icons": {
+        "16": "images/img16.png",
+        "32": "images/img32.png",
+        "48": "images/img48.png",
+        "128": "images/img128.png"
+    },
+    "permissions": [
+        "tabs",
+        "storage"
+    ]
+}

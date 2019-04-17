@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+    <title>Tab Switcher - Configuration</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <h1>Tab Switcher - Configuration</h1>
+    <fieldset>
+        <label for="urls">Enter list of URLs separated by ",""</label>
+        <textarea id="urls">https://www.google.de,https://chrome.google.com/webstore/category/extensions</textarea>
+
+        <label for="displaytime">Enter display-time for tabs in seconds separated by ","; default is 30</label>
+        <textarea id="displaytime">30,30</textarea>
+
+        <label for="autoload">Auto-Load Tab Switcher on browser-start</label>
+        <input id="autoload" type="checkbox" value="1" />
+
+        <button id="save">Save</button>
+    </fieldset>
+    <script src="options.js"></script>
+</body>
+</html>
