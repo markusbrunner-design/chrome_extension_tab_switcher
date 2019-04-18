@@ -2,6 +2,7 @@
 var SAVED_URLS = 'SAVED_URLS';
 var SAVED_DISPLAYTIME = 'SAVED_DISPLAYTIME';
 var SAVED_AUTOLOAD = 'SAVED_AUTOLOAD';
+var SAVED_RELOADTIME = 'SAVED_RELOADTIME';
 
 // Storage
 var savedUrls = '';
@@ -10,16 +11,26 @@ var savedDisplayTimes = '';
 // iteration
 var configUrls = [];
 var configDisplayTime = [];
+var configReloadTime = 0;
 var configAutoLoad = false;
 var tabIteration = [];
+var tabTimeout = null;
+var reloadTimeout = null;
+
+// defaults
+var defaultUrls = 'chrome://extensions/,https://chrome.google.com/webstore/category/extensions';
+var defaultDisplayTime = '3,3';
+var fallbackDisplayTime = 10;
+var defaultReloadTime = 0;
+var defaultAutoLoad = 0;
 
 // debug
-var debugMe = true;
+var debugMe = false;
 
 // functions
 function toConsole(s, o) {
     if(console && debugMe) {
-        console.log('Tab Switcher Background-Script:', s, o)
+        console.log('Tab Switcher Background-Script:', s, o);
     }
 }
 /**
@@ -27,18 +38,28 @@ function toConsole(s, o) {
  */
 function loadConfig(callback) {
     try {
-        chrome.storage.sync.get([SAVED_URLS, SAVED_DISPLAYTIME, SAVED_AUTOLOAD], function(result) {
+        chrome.storage.sync.get([SAVED_URLS, SAVED_DISPLAYTIME, SAVED_RELOADTIME, SAVED_AUTOLOAD], function(result) {
             toConsole('load configuration SAVED_URLS && SAVED_DISPLAYTIME && SAVED_AUTOLOAD', result);
 
-            savedUrls = result[SAVED_URLS];
+            savedUrls = result[SAVED_URLS] ? result[SAVED_URLS] : defaultUrls;
             configUrls = savedUrls.replace(' ', '').split(',');
 
-            savedDisplayTimes = result[SAVED_DISPLAYTIME];
+            savedDisplayTimes = result[SAVED_DISPLAYTIME] ? result[SAVED_DISPLAYTIME] : defaultDisplayTime;
             configDisplayTime = savedDisplayTimes.replace(' ', '').split(',');
 
-            configAutoLoad = result[SAVED_AUTOLOAD];
+            configReloadTime = result[SAVED_RELOADTIME] ? result[SAVED_RELOADTIME] : defaultReloadTime;
 
-            callback();
+            configAutoLoad = result[SAVED_AUTOLOAD] ? result[SAVED_AUTOLOAD] : defaultAutoLoad;
+
+            if(configReloadTime > 0) {
+                toConsole('start with reload-iteration', configReloadTime);
+                callback();
+                clearTimeout(reloadTimeout);
+                reloadTimeout = setTimeout(reload, configReloadTime * 3600000);
+            } else {
+                toConsole('start without reload-iteration');
+                callback();
+            }
         });
     } catch(e) {
         toConsole('could not load configuration', e);
@@ -84,7 +105,7 @@ function getDisplayTimeByKey(key) {
     try {
         return configDisplayTime[key] * 1000;
     } catch(e) {
-        return 30 * 1000;
+        return fallbackDisplayTime * 1000;
     }
 }
 /**
@@ -103,7 +124,8 @@ function iterateOpenedTabs() {
             currentSite = 0;
         }
         activateTab(tabIteration[currentSite]);
-        setTimeout(showNext, getDisplayTimeByKey(currentSite));
+        clearTimeout(tabTimeout);
+        tabTimeout = setTimeout(showNext, getDisplayTimeByKey(currentSite));
     };
     showNext();
 }
@@ -113,6 +135,14 @@ function iterateOpenedTabs() {
  */
 function activateTab(tabId) {
     chrome.tabs.update(tabId, { 'active': true }, (tab) => { });
+}
+/**
+ * Reloads the tabs via stop, start
+ */
+function reload() {
+    toConsole('reload via stop, start');
+    stop();
+    start();
 }
 /**
  * Start iteration of tabs => initialize iteration
@@ -135,7 +165,10 @@ function stop() {
         chrome.browserAction.setTitle({'title': 'Activate Tab Switcher'});
         closeTabs();
         tabIteration = [];
+        clearTimeout(tabTimeout);
+        clearTimeout(reloadTimeout);
     } catch(e) {
+        toConsole('error in stopping', e);
     }
 }
 /**

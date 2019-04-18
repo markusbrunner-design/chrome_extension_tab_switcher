@@ -1,38 +1,72 @@
-label {
+html {
+    background: #1e5799;
+    background: -webkit-linear-gradient(top, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%);
+    height: 100vh;
+}
+h1 {
+    color: #aaeeff;
+    text-shadow: 0px 5px #333;
+    padding-left: 0.3em;
+}
+fieldset {
+    background: transparent;
+    border: none;
+    margin: 0;
+}
+.form-group {
+    background: #aaeeff;
+    box-shadow: 0px 0px 5px #333;
+    margin: 1em 0;
+    padding: 0.2em;
+}
+.icon {
     clear: both;
+}
+.icon i {
+    float: left;
+    line-height: 2em;
+    font-size: 2em;
+    vertical-align: bottom;
+    padding: 0 0.5em;
+}
+label {
     display: block;
-    font-size: 1.8em;
+    font-size: 1.6em;
+    line-height: 2em;
 }
 textarea {
     clear: both;
-    width: 100%;
+    width: 90vw;
     height: 10vh;
     font-size: 1.4em;
+}
+input[type="text"] {
+    clear: both;
+    width: 90vw;
+    height: 2em;
+    font-size: 1.4em;
+}
+input[type="checkbox"] {
+    cursor: pointer;
 }
 button {
     clear: both;
     display: block;
-    width: 50%;
+    width: 90vw;
     height: 2em;
     cursor: pointer;
     font-size: 1.4em;
     text-transform: uppercase;
+    float: right;
 }
-input[type="checkbox"] {
-
+button i {
+    padding-right: 0.5em;
 }
 .hidden {
     display: none;
 }
 #save {
-    background: blue;
-    color: white;
-}
-#start {
-    background: green;
-    color: white;
-}
-#stop {
-    background: red;
+    background: black;
+    background: -webkit-linear-gradient(top, #959595 0%,#0d0d0d 46%,#010101 50%,#0a0a0a 53%,#4e4e4e 76%,#383838 87%,#1b1b1b 100%);
     color: white;
 }

@@ -2,21 +2,37 @@
 <html>
 <head>
     <title>Tab Switcher - Configuration</title>
+    <link rel="stylesheet" type="text/css" href="icofont.min.css">
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
     <h1>Tab Switcher - Configuration</h1>
     <fieldset>
-        <label for="urls">Enter list of URLs separated by ",""</label>
-        <textarea id="urls">https://www.google.de,https://chrome.google.com/webstore/category/extensions</textarea>
+        <div class="icon form-group">
+            <i class="icofont-dashboard-web"></i>
+            <label for="urls">Enter list of URLs separated by ",""</label>
+            <textarea id="urls"></textarea>
+        </div>
 
-        <label for="displaytime">Enter display-time for tabs in seconds separated by ","; default is 30</label>
-        <textarea id="displaytime">30,30</textarea>
+        <div class="icon form-group">
+            <i class="icofont-spinner-alt-3"></i>
+            <label for="displaytime">Enter display-time for tabs in seconds separated by ","; fallback-time is 10</label>
+            <textarea id="displaytime"></textarea>
+        </div>
 
-        <label for="autoload">Auto-Load Tab Switcher on browser-start</label>
-        <input id="autoload" type="checkbox" value="1" />
+        <div class="icon form-group">
+            <i class="icofont-wall-clock"></i>
+            <label for="reloadtime">Enter reload-time for tabs in hours. If =0 no reload, If >0 reload.</label>
+            <input id="reloadtime" type="text" value="0" /> 
+        </div>
 
-        <button id="save">Save</button>
+        <div class="icon form-group">
+            <i class="icofont-power"></i>
+            <label for="autoload">Auto-Load Tab Switcher on browser-start</label>
+            <input id="autoload" type="checkbox" value="1" />
+        </div>
+        
+        <button id="save"><div class="icon"></div><i class="icofont-key"></i></div>Save</button>
     </fieldset>
     <script src="options.js"></script>
 </body>
