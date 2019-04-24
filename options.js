@@ -10,18 +10,22 @@ var textarea_urls = document.getElementById('urls');
 var textarea_displayTime = document.getElementById('displaytime');
 var input_reloadtime = document.getElementById('reloadtime');
 var checkbox_autoload = document.getElementById('autoload');
+var action_feedback_box = document.getElementById('action-feedback');
 
 // actions
 saveConfigButton.addEventListener('click', saveConfig);
 
 // html css classNames
-var hiddenCssClassName = "hidden";
+var hiddenCssClassName = 'hidden';
+var successCssClassName = 'success';
+var errorCssClassName = 'error';
 
 // defaults
 var defaultUrls = 'chrome://extensions/,https://chrome.google.com/webstore/category/extensions';
 var defaultDisplayTime = '3,3';
 var defaultReloadTime = 0;
 var defaultAutoLoadChecked = '';
+var statusBoxDisplayTime = 3000;
 
 // debug
 var debugMe = false;
@@ -53,16 +57,31 @@ function loadConfig() {
  */
 function saveConfig() {
     try {
-        toConsole('save configurations', { "urls": textarea_urls.value, "displaytime": textarea_displayTime.value, "reloadtime": input_reloadtime.value, "autoload": checkbox_autoload.checked });
+        toConsole('save configurations', [ textarea_urls.value, textarea_displayTime.value, input_reloadtime.value, checkbox_autoload.checked ]);
         chrome.storage.sync.set({SAVED_URLS: textarea_urls.value, SAVED_DISPLAYTIME: textarea_displayTime.value, SAVED_RELOADTIME: input_reloadtime.value, SAVED_AUTOLOAD: checkbox_autoload.checked }, function() {
             toConsole('SAVED_URLS is set to ' + textarea_urls.value);
             toConsole('SAVED_DISPLAYTIME is set to ' + textarea_displayTime.value);
             toConsole('SAVED_RELOADTIME is set to ' + input_reloadtime.value);
             toConsole('SAVED_AUTOLOAD is set to ' + checkbox_autoload.checked);
+            showActionFeedbackBox("Configuration saved.", successCssClassName);
         });
     } catch(e) {
         toConsole('could not save configuration', e);
+        showActionFeedbackBox('Error. Could not save the configuration.', errorCssClassName);
     }
+}
+/**
+ * User-Feedback for action
+ */
+function showActionFeedbackBox(message, CssclassName) {
+    action_feedback_box.classList.remove(hiddenCssClassName);
+    action_feedback_box.classList.add(CssclassName);
+    action_feedback_box.innerHTML = message;
+    setTimeout(function() {
+        action_feedback_box.classList.add(hiddenCssClassName);
+        action_feedback_box.classList.remove(CssclassName);
+        action_feedback_box.innerHTML = '';
+    }, statusBoxDisplayTime);
 }
 
 /**

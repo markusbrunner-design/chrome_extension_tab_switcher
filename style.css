@@ -65,6 +65,21 @@ button i {
 .hidden {
     display: none;
 }
+#action-feedback {
+    background: black;
+    color: white;
+    border: 1px solid white;
+    padding: 0.5em 1em;
+    font-size: 2em;
+    line-height: 2em;
+    text-shadow: 0px 0px 5px white;
+}
+#action-feedback.success {
+    background: green;
+}
+#action-feedback.error {
+    background: red;
+}
 #save {
     background: black;
     background: -webkit-linear-gradient(top, #959595 0%,#0d0d0d 46%,#010101 50%,#0a0a0a 53%,#4e4e4e 76%,#383838 87%,#1b1b1b 100%);

@@ -23,6 +23,8 @@ var defaultDisplayTime = '3,3';
 var fallbackDisplayTime = 10;
 var defaultReloadTime = 0;
 var defaultAutoLoad = 0;
+var defaultExtensionImage = 'images/img128.png';
+var activeExtensionImage = 'images/img128_active.png';
 
 // debug
 var debugMe = false;
@@ -82,20 +84,22 @@ function openTabs() {
             });   
         });
     } catch(e) {
-        toConsole("could not open tab", e);
+        toConsole('could not open tab', e);
     }
 }
 /**
  * Close all opened tabs
  */
 function closeTabs() {
-    try {
-        tabIteration.forEach(function(tabId) {
-            chrome.tabs.remove(tabId);
-        });
-    } catch(e) {
-        toConsole("could not close tabs", e);
-    }
+    tabIteration.forEach(function(tabId) {
+        try {
+            chrome.tabs.get(tabId, function() {
+                chrome.tabs.remove(tabId);
+            });
+        } catch(e) {
+            toConsole('could not close tab', [tabId, e]);
+        }
+    });
 }
 /**
  * Return displaytime in milliseconds depending on configuration
@@ -151,6 +155,7 @@ function start() {
     toConsole('start');
     try {
         chrome.browserAction.setTitle({'title': 'Deactivate Tab Switcher'});
+        chrome.browserAction.setIcon({'path': activeExtensionImage});
         loadConfig(openTabs);
     } catch(e) {
         stop();
@@ -163,6 +168,7 @@ function stop() {
     toConsole('stop');
     try {
         chrome.browserAction.setTitle({'title': 'Activate Tab Switcher'});
+        chrome.browserAction.setIcon({'path': defaultExtensionImage});
         closeTabs();
         tabIteration = [];
         clearTimeout(tabTimeout);
@@ -179,6 +185,15 @@ chrome.browserAction.onClicked.addListener(function(){
         start(); 
     } else {
         stop();
+    }
+});
+/**
+ * Add Listener for Tab-Remove
+ */
+chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
+    var indexOfTabId = tabIteration.indexOf(tabId);
+    if(indexOfTabId >= 0) {
+        tabIteration.splice(indexOfTabId, 1);
     }
 });
 /**

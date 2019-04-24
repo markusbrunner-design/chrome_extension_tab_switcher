@@ -10,6 +10,20 @@ Markus Brunner <https://github.com/markusbrunner-design/>
 
 https://github.com/markusbrunner-design/chrome_extension_tab_switcher.git
 
+## Usage
+
+### Configuration
+
+Go to options-page (see: examples/ts_options.png; options in context-menue of the extension-icon) and set your preferred values for tab-switcher:
+* urls: comma-separated list of urls
+* display-time: comma-separated list of tab-display-time in seconds
+* reload-time (close tabs and reinitiate = valuable for applications which would crash the browser otherwise): integer/double value in hours => -1 = deactivated; 1 = each hour; 0.25 = each quarter hour; 24 = each day
+* auto-load: if active the tabs will be automatically opened on browser-load (if opened via kiosk-mode you need to enable the extension can be run in private mode option in chrome extension settings)
+
+### Activation
+
+Just click on the extension-icon to activate the tab-switcher and click again for deactivation (see examples/ts_activated.png).
+
 ## Development based on
 
 * Chrome API:
@@ -22,9 +36,9 @@ https://github.com/markusbrunner-design/chrome_extension_tab_switcher.git
     * https://developer.chrome.com/extensions/background_pages
     * https://medium.com/@vanessajimenez_85032/chrome-extensions-content-scripts-vs-background-scripts-7bbd01f9dbe6
 
-### conclusions
+### Conclusions
 
-* no content_scripts needed
-* options_page needed for settings
-* browser_action => background task (not working together with popup...)
+* no content_scripts needed => no change of opened pages
+* options_page needed for settings => save in chrome storage
 * background_scripts needed for fullfilling the tab-switching logic
+* browser_action => background task needed (not working together with popup action...)
