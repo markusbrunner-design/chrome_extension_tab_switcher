@@ -19,8 +19,8 @@ https://github.com/markusbrunner-design/chrome_extension_tab_switcher.git
 ### Configuration
 
 Go to options-page (see: examples/ts_options.png; options in context-menue of the extension-icon) and set your preferred values for tab-switcher:
-* urls: comma-separated list of urls
-* display-time: comma-separated list of tab-display-time in seconds
+* urls: return-separated list of urls
+* display-time: return-separated list of tab-display-time in seconds
 * reload-time (close tabs and reinitiate = valuable for applications which would crash the browser otherwise): integer/double value in hours => -1 = deactivated; 1 = each hour; 0.25 = each quarter hour; 24 = each day
 * auto-load: if active the tabs will be automatically opened on browser-load (if opened via kiosk-mode you need to enable the extension can be run in private mode option in chrome extension settings)
 

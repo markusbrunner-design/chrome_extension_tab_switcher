@@ -21,8 +21,8 @@ var successCssClassName = 'success';
 var errorCssClassName = 'error';
 
 // defaults
-var defaultUrls = 'chrome://extensions/,https://chrome.google.com/webstore/category/extensions';
-var defaultDisplayTime = '3,3';
+var defaultUrls = "chrome://extensions/\r\nhttps://chrome.google.com/webstore/category/extensions";
+var defaultDisplayTime = "3\r\n3";
 var defaultReloadTime = 0;
 var defaultAutoLoadChecked = '';
 var statusBoxDisplayTime = 3000;

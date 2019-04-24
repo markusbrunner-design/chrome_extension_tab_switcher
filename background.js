@@ -44,10 +44,10 @@ function loadConfig(callback) {
             toConsole('load configuration SAVED_URLS && SAVED_DISPLAYTIME && SAVED_AUTOLOAD', result);
 
             savedUrls = result[SAVED_URLS] ? result[SAVED_URLS] : defaultUrls;
-            configUrls = savedUrls.replace(' ', '').split(',');
+            configUrls = savedUrls.replace(' ', '').split(/\r|\n/);
 
             savedDisplayTimes = result[SAVED_DISPLAYTIME] ? result[SAVED_DISPLAYTIME] : defaultDisplayTime;
-            configDisplayTime = savedDisplayTimes.replace(' ', '').split(',');
+            configDisplayTime = savedDisplayTimes.replace(' ', '').split(/\r|\n/);
 
             configReloadTime = result[SAVED_RELOADTIME] ? result[SAVED_RELOADTIME] : defaultReloadTime;
 
