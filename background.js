@@ -199,8 +199,6 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
 /**
  * Start automatically if option was set for auto-load
  */
-loadConfig(function(){
-    if(configAutoLoad) {
-        openTabs();
-    }
+chrome.windows.onCreated.addListener(function() {
+    start();
 });
