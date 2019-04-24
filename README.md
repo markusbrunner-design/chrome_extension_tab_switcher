@@ -10,6 +10,10 @@ Markus Brunner <https://github.com/markusbrunner-design/>
 
 https://github.com/markusbrunner-design/chrome_extension_tab_switcher.git
 
+## Chrome Web Store
+
+=> Chrome Extension Tab Switcher: https://chrome.google.com/webstore/detail/chrome-extension-tab-swit/ndjdbgjlaggipkekdpicpcldaocmigfl
+
 ## Usage
 
 ### Configuration
