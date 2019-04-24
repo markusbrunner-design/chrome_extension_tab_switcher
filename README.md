@@ -30,6 +30,7 @@ Just click on the extension-icon to activate the tab-switcher and click again fo
     * Tabs: https://developer.chrome.com/extensions/tabs
     * Storage: https://developer.chrome.com/extensions/storage
 * How-To Chrome Extension: 
+    * https://developer.chrome.com/extensions/manifest
     * https://medium.freecodecamp.org/how-to-create-a-chrome-extension-part-1-ad2a3a77541
     * https://medium.com/tech-tajawal/build-a-simple-google-chrome-extension-in-few-minutes-1f13b600e83e
     * https://stackoverflow.com/questions/43055526/chrome-extension-popup-not-showing-anymore
