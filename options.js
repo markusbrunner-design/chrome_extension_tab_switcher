@@ -21,10 +21,10 @@ var successCssClassName = 'success';
 var errorCssClassName = 'error';
 
 // defaults
-var defaultUrls = "chrome://extensions/\r\nhttps://chrome.google.com/webstore/category/extensions";
-var defaultDisplayTime = "3\r\n3";
+var defaultUrls = "chrome://extensions/\nhttps://chrome.google.com/webstore/category/extensions";
+var defaultDisplayTime = "3\n3";
 var defaultReloadTime = 0;
-var defaultAutoLoadChecked = '';
+var defaultAutoLoadChecked = false;
 var statusBoxDisplayTime = 3000;
 
 // debug
@@ -58,7 +58,7 @@ function loadConfig() {
 function saveConfig() {
     try {
         toConsole('save configurations', [ textarea_urls.value, textarea_displayTime.value, input_reloadtime.value, checkbox_autoload.checked ]);
-        chrome.storage.sync.set({SAVED_URLS: textarea_urls.value, SAVED_DISPLAYTIME: textarea_displayTime.value, SAVED_RELOADTIME: input_reloadtime.value, SAVED_AUTOLOAD: checkbox_autoload.checked }, function() {
+        chrome.storage.sync.set({SAVED_URLS: textarea_urls.value.replace(/ /g,''), SAVED_DISPLAYTIME: textarea_displayTime.value.replace(/ /g,''), SAVED_RELOADTIME: input_reloadtime.value*1, SAVED_AUTOLOAD: !!checkbox_autoload.checked }, function() {
             toConsole('SAVED_URLS is set to ' + textarea_urls.value);
             toConsole('SAVED_DISPLAYTIME is set to ' + textarea_displayTime.value);
             toConsole('SAVED_RELOADTIME is set to ' + input_reloadtime.value);

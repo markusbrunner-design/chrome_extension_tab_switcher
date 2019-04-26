@@ -18,8 +18,8 @@ var tabTimeout = null;
 var reloadTimeout = null;
 
 // defaults
-var defaultUrls = 'chrome://extensions/,https://chrome.google.com/webstore/category/extensions';
-var defaultDisplayTime = '3,3';
+var defaultUrls = 'chrome://extensions/\nhttps://chrome.google.com/webstore/category/extensions';
+var defaultDisplayTime = '3\n3';
 var fallbackDisplayTime = 10;
 var defaultReloadTime = 0;
 var defaultAutoLoad = 0;
@@ -44,10 +44,10 @@ function loadConfig(callback) {
             toConsole('load configuration SAVED_URLS && SAVED_DISPLAYTIME && SAVED_AUTOLOAD', result);
 
             savedUrls = result[SAVED_URLS] ? result[SAVED_URLS] : defaultUrls;
-            configUrls = savedUrls.replace(' ', '').split(/\r|\n/);
+            configUrls = savedUrls.replace(/ /g, '').split(/\r|\n/);
 
             savedDisplayTimes = result[SAVED_DISPLAYTIME] ? result[SAVED_DISPLAYTIME] : defaultDisplayTime;
-            configDisplayTime = savedDisplayTimes.replace(' ', '').split(/\r|\n/);
+            configDisplayTime = savedDisplayTimes.replace(/ /g, '').split(/\r|\n/);
 
             configReloadTime = result[SAVED_RELOADTIME] ? result[SAVED_RELOADTIME] : defaultReloadTime;
 
@@ -86,6 +86,14 @@ function openTabs() {
     } catch(e) {
         toConsole('could not open tab', e);
     }
+}
+/**
+ * Reloads the tabs via stop, start
+ */
+function reload() {
+    toConsole('reload via stop, start');
+    stop();
+    start();
 }
 /**
  * Close all opened tabs
@@ -141,14 +149,6 @@ function activateTab(tabId) {
     chrome.tabs.update(tabId, { 'active': true }, (tab) => { });
 }
 /**
- * Reloads the tabs via stop, start
- */
-function reload() {
-    toConsole('reload via stop, start');
-    stop();
-    start();
-}
-/**
  * Start iteration of tabs => initialize iteration
  */
 function start() {
@@ -200,5 +200,9 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
  * Start automatically if option was set for auto-load
  */
 chrome.windows.onCreated.addListener(function() {
-    start();
+    try {
+        start();
+    } catch(e) {
+        stop();
+    }
 });
