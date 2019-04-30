@@ -14,20 +14,6 @@ https://github.com/markusbrunner-design/chrome_extension_tab_switcher.git
 
 => Chrome Extension Tab Switcher: https://chrome.google.com/webstore/detail/chrome-extension-tab-swit/ndjdbgjlaggipkekdpicpcldaocmigfl
 
-## Usage
-
-### Configuration
-
-Go to options-page (see: examples/ts_options.png; options in context-menue of the extension-icon) and set your preferred values for tab-switcher:
-* urls: return-separated list of urls
-* display-time: return-separated list of tab-display-time in seconds
-* reload-time (close tabs and reinitiate = valuable for applications which would crash the browser otherwise): integer/double value in hours => -1 = deactivated; 1 = each hour; 0.25 = each quarter hour; 24 = each day
-* auto-load: if active the tabs will be automatically opened on browser-load (if opened via kiosk-mode you need to enable the extension can be run in private mode option in chrome extension settings)
-
-### Activation
-
-Just click on the extension-icon to activate the tab-switcher and click again for deactivation (see examples/ts_activated.png).
-
 ## Development based on
 
 * Chrome API:
@@ -47,3 +33,92 @@ Just click on the extension-icon to activate the tab-switcher and click again fo
 * options_page needed for settings => save in chrome storage
 * background_scripts needed for fullfilling the tab-switching logic
 * browser_action => background task needed (not working together with popup action...)
+
+## Usage
+
+### Configuration
+
+Go to options-page (see: examples/ts_options.png; options in context-menue of the extension-icon) and set your preferred values for tab-switcher:
+* urls: return-separated list of urls
+* display-time: return-separated list of tab-display-time in seconds
+* reload-time (close tabs and reinitiate = valuable for applications which would crash the browser otherwise): integer/double value in hours => -1 = deactivated; 1 = each hour; 0.25 = each quarter hour; 24 = each day
+* auto-load: if active the tabs will be automatically opened on browser-load (if opened via kiosk-mode you need to enable the extension can be run in private mode option in chrome extension settings)
+
+### Activation
+
+Just click on the extension-icon to activate the tab-switcher and click again for deactivation (see examples/ts_activated.png).
+
+### Usage with applications needing auto-login
+
+### Suggested usage
+
+Use it on a linux-based plattform like raspbian for displaying graphs on a monitor.
+
+#### Configure Tab-Switcher
+
+1. Enable the mode "allow usage in private mode" in chrome://extensions/ for the extension "Tab Switcher"
+2. Choose "Auto-Load" on the options-page
+
+#### Cron-Job Auto-Update Auto-Reboot
+
+Therefore you should add the following cron-job to auto-update and auto-restart:
+
+    $ sudo su
+    $ crontab -e
+    
+    # add this line to your crontab configuration to auto-update and auto-reboot
+    0 5 * * 1 apt update && apt upgrade -y && reboot
+
+#### Run Kiosk-Mode on reboot
+
+Furthermore you need to auto-start the browser - in this case chrome / chromium - on reboot via kiosk-mode:
+
+Chrome in Kiosk Mode without screensaver (https://itrig.de/index.php?/archives/2309-Raspberry-Pi-3-Kiosk-Chromium-Autostart-im-Vollbildmodus-einrichten.html)
+
+    $ sudo nano /home/pi/.config/lxsession/LXDE-pi/autostart
+    $ sudo nano /home/pmocteamtooluser/.config/lxsession/LXDE-pi/autostart
+
+    # add the following lines to both configurations:
+    @lxpanel --profile LXDE-pi
+    @pcmanfm --desktop --profile LXDE-pi
+    #@xscreensaver -no-splash
+    @unclutter
+    @xset s off
+    @xset -dpms
+    @xset s noblank
+    @chromium-browser --incognito --kiosk chrome://extensions/
+
+#### Add Tampermonkey Scripts for Auto-Login of applications, example for a zabbix-application
+
+Therefore first install the "Tampermonkey" extension on Chrome Web Store: https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo
+
+    // ==UserScript==
+    // @name         Auto-Login Zabbix
+    // @namespace    http://tampermonkey.net/
+    // @version      1.0
+    // @description  Tooluser Zabbix-Login
+    // @author       You
+    // @match        https://myzabbixinstance.com/*
+    // @grant        none
+    // ==/UserScript==
+
+    (function() {
+    'use strict';
+
+        try {
+            // login step 1
+            if(document.getElementById('login')) {
+                document.getElementById('login').click();
+            }
+
+            // login step 2
+            if(document.getElementById('name')) {
+                document.getElementById('name').value = 'myuser';
+                document.getElementById('password').value = 'mypassword';
+                document.getElementById('enter').click();
+            }
+        } catch(e) {
+            if(console) { console.log(e); }
+        }
+
+    })();

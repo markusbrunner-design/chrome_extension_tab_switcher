@@ -101,11 +101,10 @@ function reload() {
 function closeTabs() {
     tabIteration.forEach(function(tabId) {
         try {
-            chrome.tabs.get(tabId, function() {
-                chrome.tabs.remove(tabId);
-            });
+            chrome.tabs.remove(tabId);
         } catch(e) {
-            toConsole('could not close tab', [tabId, e]);
+            toConsole('Error in closeTabs: ', [tabId, e]);
+            removeTabFromConfigArray(tabId);
         }
     });
 }
@@ -114,11 +113,12 @@ function closeTabs() {
  * @param {} key 
  */
 function getDisplayTimeByKey(key) {
-    try {
-        return configDisplayTime[key] * 1000;
-    } catch(e) {
-        return fallbackDisplayTime * 1000;
+    var displayTime = fallbackDisplayTime * 1000;
+    if(configDisplayTime[key]) {
+        displayTime = configDisplayTime[key] * 1000;
     }
+    toConsole('key, displayTime in ms: ', [key, displayTime])
+    return displayTime;
 }
 /**
  * Iterate "tabIteration"
@@ -146,7 +146,23 @@ function iterateOpenedTabs() {
  * @param {*} tabId 
  */
 function activateTab(tabId) {
-    chrome.tabs.update(tabId, { 'active': true }, (tab) => { });
+    try {
+        chrome.tabs.update(tabId, { 'active': true }, (tab) => { });
+    } catch(e) {
+        toConsole('Error for activateTab:', [tabId, e]);
+        removeTabFromConfigArray(tabId);
+    }
+}
+/**
+ * Remove tab from tabIteration-array
+ * @param {*} tabId 
+ */
+function removeTabFromConfigArray(tabId) {
+    toConsole('remove tab with Id: ', tabId);
+    var indexOfTabId = tabIteration.indexOf(tabId);
+    if(indexOfTabId >= 0) {
+        tabIteration.splice(indexOfTabId, 1);
+    }
 }
 /**
  * Start iteration of tabs => initialize iteration
@@ -190,11 +206,8 @@ chrome.browserAction.onClicked.addListener(function(){
 /**
  * Add Listener for Tab-Remove
  */
-chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
-    var indexOfTabId = tabIteration.indexOf(tabId);
-    if(indexOfTabId >= 0) {
-        tabIteration.splice(indexOfTabId, 1);
-    }
+chrome.tabs.onRemoved.addListener(function(tabId) {
+    removeTabFromConfigArray(tabId);
 });
 /**
  * Start automatically if option was set for auto-load
@@ -205,4 +218,10 @@ chrome.windows.onCreated.addListener(function() {
     } catch(e) {
         stop();
     }
+});
+/**
+ * Stop automatically on window-close
+ */
+chrome.windows.onRemoved.addListener(function() {
+    stop();
 });
