@@ -56,8 +56,7 @@ Use it on a linux-based plattform like raspbian for displaying graphs on a monit
 
 #### Configure Tab-Switcher
 
-1. Enable the mode "allow usage in private mode" in chrome://extensions/ for the extension "Tab Switcher"
-2. Choose "Auto-Load" on the options-page
+Choose "Auto-Load" on the options-page
 
 #### Cron-Job Auto-Update Auto-Reboot
 
@@ -76,7 +75,7 @@ Furthermore you need to auto-start the browser - in this case chrome / chromium 
 Chrome in Kiosk Mode without screensaver (https://itrig.de/index.php?/archives/2309-Raspberry-Pi-3-Kiosk-Chromium-Autostart-im-Vollbildmodus-einrichten.html)
 
     $ sudo nano /home/pi/.config/lxsession/LXDE-pi/autostart
-    $ sudo nano /home/pmocteamtooluser/.config/lxsession/LXDE-pi/autostart
+    $ sudo nano /home/mydefaultnonadminuser/.config/lxsession/LXDE-pi/autostart
 
     # add the following lines to both configurations:
     @lxpanel --profile LXDE-pi
@@ -86,7 +85,7 @@ Chrome in Kiosk Mode without screensaver (https://itrig.de/index.php?/archives/2
     @xset s off
     @xset -dpms
     @xset s noblank
-    @chromium-browser --incognito --kiosk chrome://extensions/
+    @chromium-browser --kiosk chrome://extensions/
 
 #### Add Tampermonkey Scripts for Auto-Login of applications, example for a zabbix-application
 

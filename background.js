@@ -210,18 +210,19 @@ chrome.tabs.onRemoved.addListener(function(tabId) {
     removeTabFromConfigArray(tabId);
 });
 /**
- * Start automatically if option was set for auto-load
- */
-chrome.windows.onCreated.addListener(function() {
-    try {
-        start();
-    } catch(e) {
-        stop();
-    }
-});
-/**
  * Stop automatically on window-close
  */
 chrome.windows.onRemoved.addListener(function() {
     stop();
+});
+/**
+ * Start automatically if option was set for auto-load
+ */
+chrome.windows.onCreated.addListener(function () {
+    loadConfig(function(){
+        toConsole('loadConfig initial', [configUrls, configDisplayTime, configReloadTime, configAutoLoad]);
+        if(configAutoLoad) {
+            start();
+        }
+    });
 });
