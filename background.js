@@ -1,6 +1,7 @@
 // Constants
 var SAVED_URLS = 'SAVED_URLS';
 var SAVED_DISPLAYTIME = 'SAVED_DISPLAYTIME';
+var SAVED_AUTOTABRELOAD = 'SAVED_AUTOTABRELOAD';
 var SAVED_AUTOLOAD = 'SAVED_AUTOLOAD';
 var SAVED_RELOADTIME = 'SAVED_RELOADTIME';
 
@@ -12,6 +13,7 @@ var savedDisplayTimes = '';
 var configUrls = [];
 var configDisplayTime = [];
 var configReloadTime = 0;
+var configAutoTabReload = false;
 var configAutoLoad = false;
 var tabIteration = [];
 var tabTimeout = null;
@@ -23,8 +25,10 @@ var defaultDisplayTime = '3\n3';
 var fallbackDisplayTime = 10;
 var defaultReloadTime = 0;
 var defaultAutoLoad = 0;
+var defaultAutoTabReload = 0;
 var defaultExtensionImage = 'images/img128.png';
 var activeExtensionImage = 'images/img128_active.png';
+var defaultWindowId = chrome.windows.WINDOW_ID_CURRENT;
 
 // debug
 var debugMe = false;
@@ -40,8 +44,8 @@ function toConsole(s, o) {
  */
 function loadConfig(callback) {
     try {
-        chrome.storage.sync.get([SAVED_URLS, SAVED_DISPLAYTIME, SAVED_RELOADTIME, SAVED_AUTOLOAD], function(result) {
-            toConsole('load configuration SAVED_URLS && SAVED_DISPLAYTIME && SAVED_AUTOLOAD', result);
+        chrome.storage.sync.get([SAVED_URLS, SAVED_DISPLAYTIME, SAVED_RELOADTIME, SAVED_AUTOTABRELOAD, SAVED_AUTOLOAD], function(result) {
+            toConsole('load configuration SAVED_URLS && SAVED_DISPLAYTIME && SAVED_AUTOTABRELOAD && SAVED_AUTOLOAD', result);
 
             savedUrls = result[SAVED_URLS] ? result[SAVED_URLS] : defaultUrls;
             configUrls = savedUrls.replace(/ /g, '').split(/\r|\n/);
@@ -51,16 +55,22 @@ function loadConfig(callback) {
 
             configReloadTime = result[SAVED_RELOADTIME] ? result[SAVED_RELOADTIME] : defaultReloadTime;
 
+            configAutoTabReload = result[SAVED_AUTOTABRELOAD] ? result[SAVED_AUTOTABRELOAD] : defaultAutoTabReload;
+
             configAutoLoad = result[SAVED_AUTOLOAD] ? result[SAVED_AUTOLOAD] : defaultAutoLoad;
 
             if(configReloadTime > 0) {
                 toConsole('start with reload-iteration', configReloadTime);
-                callback();
+                if(callback) {
+                    callback();
+                }
                 clearTimeout(reloadTimeout);
                 reloadTimeout = setTimeout(reload, configReloadTime * 3600000);
             } else {
                 toConsole('start without reload-iteration');
-                callback();
+                if(callback) {
+                    callback();
+                }
             }
         });
     } catch(e) {
@@ -73,7 +83,7 @@ function loadConfig(callback) {
 function openTabs() {
     try {
         configUrls.forEach(function(configUrl, key) {
-            chrome.tabs.create({ url: configUrl }, function(tab) {
+            chrome.tabs.create({ "windowId": defaultWindowId, "url": configUrl }, function(tab) {
                 tabIteration.push(tab.id);
                 toConsole('push tab to iteration array', [tabIteration, tab, configUrls.length, key]);
 
@@ -114,40 +124,67 @@ function closeTabs() {
  */
 function getDisplayTimeByKey(key) {
     var displayTime = fallbackDisplayTime * 1000;
-    if(configDisplayTime[key]) {
-        displayTime = configDisplayTime[key] * 1000;
+    try {
+        if(configDisplayTime[key]) {
+            displayTime = configDisplayTime[key] * 1000;
+        }
+        if(displayTime < 0) {
+            displayTime = fallbackDisplayTime * 1000;
+        }   
+    } catch(e) {
+        toConsole('getDisplayTimeByKey error:', e);
     }
-    toConsole('key, displayTime in ms: ', [key, displayTime])
+    toConsole('key, displayTime in ms: ', [key, displayTime]);
     return displayTime;
 }
 /**
  * Iterate "tabIteration"
  */
 function iterateOpenedTabs() {
-    var currentSite = 0;
+    var activeSite = 0,
+        tmpOldSite = 0;
     var showNext = function() {
-        toConsole('showNext', [currentSite, tabIteration]);
+        toConsole('showNext', [activeSite, tabIteration]);
         if(tabIteration.length < 1) {
             toConsole('tabIteration array is empty => nothing to show here...', tabIteration);
             return false;
         }
-        currentSite++;
-        if(currentSite >= tabIteration.length) {
-            currentSite = 0;
+        tmpOldSite = activeSite;
+        activeSite++;
+        if(activeSite >= tabIteration.length) {
+            activeSite = 0;
         }
-        activateTab(tabIteration[currentSite]);
+        activateTab(tabIteration[activeSite], activeSite);
+        if(configAutoTabReload) {
+            reloadTab(tabIteration[tmpOldSite]);
+        }
         clearTimeout(tabTimeout);
-        tabTimeout = setTimeout(showNext, getDisplayTimeByKey(currentSite));
+        tabTimeout = setTimeout(showNext, getDisplayTimeByKey(activeSite));
     };
     showNext();
+}
+/**
+ * Reload a tab
+ * @param {*} tabId 
+ */
+function reloadTab(tabId, callback) {
+    try{
+        chrome.tabs.reload(tabId, function() {
+            if(callback) {
+                callback();
+            }
+        });
+    } catch(e) {
+        toConsole('Error for reloadTab:', [tabId, e]);
+    }
 }
 /**
  * Activate another tab
  * @param {*} tabId 
  */
-function activateTab(tabId) {
+function activateTab(tabId, currentSite) {
     try {
-        chrome.tabs.update(tabId, { 'active': true }, (tab) => { });
+        chrome.tabs.update(tabId, { "active": true }, (tab) => { });
     } catch(e) {
         toConsole('Error for activateTab:', [tabId, e]);
         removeTabFromConfigArray(tabId);
@@ -159,9 +196,13 @@ function activateTab(tabId) {
  */
 function removeTabFromConfigArray(tabId) {
     toConsole('remove tab with Id: ', tabId);
-    var indexOfTabId = tabIteration.indexOf(tabId);
-    if(indexOfTabId >= 0) {
-        tabIteration.splice(indexOfTabId, 1);
+    try {
+        var indexOfTabId = tabIteration.indexOf(tabId);
+        if(indexOfTabId >= 0) {
+            tabIteration.splice(indexOfTabId, 1);
+        }
+    } catch(e) {
+        toConsole('removeTabFromConfigArray error:', e);
     }
 }
 /**
@@ -170,8 +211,8 @@ function removeTabFromConfigArray(tabId) {
 function start() {
     toConsole('start');
     try {
-        chrome.browserAction.setTitle({'title': 'Deactivate Tab Switcher'});
-        chrome.browserAction.setIcon({'path': activeExtensionImage});
+        chrome.browserAction.setTitle({"title": 'Deactivate Tab Switcher'});
+        chrome.browserAction.setIcon({"path": activeExtensionImage});
         loadConfig(openTabs);
     } catch(e) {
         stop();
@@ -183,8 +224,8 @@ function start() {
 function stop() {
     toConsole('stop');
     try {
-        chrome.browserAction.setTitle({'title': 'Activate Tab Switcher'});
-        chrome.browserAction.setIcon({'path': defaultExtensionImage});
+        chrome.browserAction.setTitle({"title": 'Activate Tab Switcher'});
+        chrome.browserAction.setIcon({"path": defaultExtensionImage});
         closeTabs();
         tabIteration = [];
         clearTimeout(tabTimeout);

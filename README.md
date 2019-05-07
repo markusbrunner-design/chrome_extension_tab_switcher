@@ -65,29 +65,72 @@ Therefore you should add the following cron-job to auto-update and auto-restart:
     $ sudo su
     $ crontab -e
     
-    # add this line to your crontab configuration to auto-update and auto-reboot
-    0 5 * * 1 apt update && apt upgrade -y && reboot
+    # add this line to your crontab configuration to auto-update and auto-reboot every monday at 5 AM
+    0 5 * * 1 sudo apt update && sudo apt upgrade -y && sudo apt-get install chromium-browser -y && sudo reboot
 
 #### Run Kiosk-Mode on reboot
 
 Furthermore you need to auto-start the browser - in this case chrome / chromium - on reboot via kiosk-mode:
 
-Chrome in Kiosk Mode without screensaver (https://itrig.de/index.php?/archives/2309-Raspberry-Pi-3-Kiosk-Chromium-Autostart-im-Vollbildmodus-einrichten.html)
+Chrome in Kiosk Mode without screensaver
+* https://itrig.de/index.php?/archives/2309-Raspberry-Pi-3-Kiosk-Chromium-Autostart-im-Vollbildmodus-einrichten.html
+* https://pimylifeup.com/raspberry-pi-kiosk/
+* https://www.reddit.com/r/raspberry_pi/comments/9bmxbj/how_to_launch_chromium_in_kiosk_mode_from_a/
+* https://www.raspberrypi.org/forums/viewtopic.php?t=176129
 
     $ sudo nano /home/pi/.config/lxsession/LXDE-pi/autostart
     $ sudo nano /home/mydefaultnonadminuser/.config/lxsession/LXDE-pi/autostart
 
-    # add the following lines to both configurations:
-    @lxpanel --profile LXDE-pi
-    @pcmanfm --desktop --profile LXDE-pi
-    #@xscreensaver -no-splash
-    @unclutter
-    @xset s off
-    @xset -dpms
-    @xset s noblank
-    @chromium-browser --kiosk chrome://extensions/
+        # add the following lines to both configurations:
+        @lxpanel --profile LXDE-pi
+        @pcmanfm --desktop --profile LXDE-pi
+        @xscreensaver -no-splash
+        @unclutter
+        @xset s off
+        @xset -dpms
+        @xset s noblank
+        #@chromium-browser --noerrdialogs --start-fullscreen chrome://extensions
+        @/home/pi/chromium_start.sh
 
-#### Add Tampermonkey Scripts for Auto-Login of applications, example for a zabbix-application
+    $ sudo nano /home/pi/chromium_start.sh
+
+        #!/bin/bash
+        # some initial sleep time - to get every other application ready
+        sleep 15
+        # starts chromium without missing lib-failures in fullscreen (like F11) [other possibility is --kiosk which can not be exitec with F11]
+        DISPLAY=:0 chromium-browser --noerrdialogs --start-fullscreen chrome://extensions
+
+#### Add Tampermonkey Scripts for Auto-Login of applications
+
+##### "standard-login-page"
+
+    // ==UserScript==
+    // @name         Auto-Login SSO
+    // @namespace    http://tampermonkey.net/
+    // @version      1.0
+    // @description  Tooluser Auto-Login for Services
+    // @author       You
+    // @match        https://my.login.de/sso/login?*
+    // @grant        none
+    // ==/UserScript==
+
+    (function() {
+    'use strict';
+
+        try {
+            if(document.getElementById('username')) {
+            document.getElementById('username').value = 'myuser';
+            document.getElementById('password').value = 'mypassword';
+            document.querySelector('input[type="submit"]').removeAttribute('disabled');
+            document.querySelector('input[type="submit"]').click();
+            }
+        } catch(e) {
+            if(console) { console.log(e); }
+        }
+
+    })();
+
+##### Zabbix
 
 Therefore first install the "Tampermonkey" extension on Chrome Web Store: https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo
 

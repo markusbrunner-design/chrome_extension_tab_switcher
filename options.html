@@ -10,7 +10,7 @@
     <fieldset>
         <div class="icon form-group">
             <i class="icofont-dashboard-web"></i>
-            <label for="urls">Enter list of URLs separated by ",""</label>
+            <label for="urls">Enter list of URLs => separated by line-break (return)</label>
             <textarea id="urls"></textarea>
         </div>
 
@@ -22,13 +22,19 @@
 
         <div class="icon form-group">
             <i class="icofont-wall-clock"></i>
-            <label for="reloadtime">Enter reload-time for tabs in hours. If =0 no reload, If >0 reload. => separated by line-break (return)</label>
+            <label for="reloadtime">Destroy and reinitiate all tabs after X hours. If =0 no reinitiation, If >0 reinitiation after X hours.</label>
             <input id="reloadtime" type="text" value="0" /> 
         </div>
 
         <div class="icon form-group">
+            <i class="icofont-wall-clock"></i>
+            <label for="autotabreload">Auto-tab-reload on tab-switch (old site is reloaded on tab-switch)</label>
+            <input id="autotabreload" type="checkbox" value="1" />
+        </div>
+
+        <div class="icon form-group">
             <i class="icofont-power"></i>
-            <label for="autoload">Auto-Load Tab Switcher on browser-start</label>
+            <label for="autoload">Auto-load Tab Switcher on browser-start</label>
             <input id="autoload" type="checkbox" value="1" />
         </div>
         
