@@ -66,7 +66,7 @@ Therefore you should add the following cron-job to auto-update and auto-restart:
     $ crontab -e
     
     # add this line to your crontab configuration to auto-update and auto-reboot every monday at 5 AM
-    0 5 * * 1 sudo apt update && sudo apt upgrade -y && sudo apt-get install chromium-browser -y && sudo reboot
+    0 5 * * 1 sudo apt update && sudo apt upgrade -y && sudo apt install chromium-browser -y && sudo reboot
 
 #### Run Kiosk-Mode on reboot
 
