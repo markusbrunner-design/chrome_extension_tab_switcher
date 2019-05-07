@@ -24,7 +24,7 @@ var errorCssClassName = 'error';
 
 // defaults
 var defaultUrls = "chrome://extensions/\nhttps://chrome.google.com/webstore/category/extensions";
-var defaultDisplayTime = "3\n3";
+var defaultDisplayTime = "10\n10";
 var defaultReloadTime = 0;
 var defaultAutoTabReload = false;
 var defaultAutoLoadChecked = false;

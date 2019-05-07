@@ -21,7 +21,7 @@ var reloadTimeout = null;
 
 // defaults
 var defaultUrls = 'chrome://extensions/\nhttps://chrome.google.com/webstore/category/extensions';
-var defaultDisplayTime = '3\n3';
+var defaultDisplayTime = '10\n10';
 var fallbackDisplayTime = 10;
 var defaultReloadTime = 0;
 var defaultAutoLoad = 0;
@@ -259,11 +259,16 @@ chrome.windows.onRemoved.addListener(function() {
 /**
  * Start automatically if option was set for auto-load
  */
-chrome.windows.onCreated.addListener(function () {
-    loadConfig(function(){
-        toConsole('loadConfig initial', [configUrls, configDisplayTime, configReloadTime, configAutoLoad]);
-        if(configAutoLoad) {
-            start();
-        }
-    });
+chrome.windows.onCreated.addListener(function (window) {
+    chrome.tabs.query({"windowId" : window.id}, function() {
+        chrome.windows.update(window.id, { "focused": true }, function(window) {
+            toConsole('chrome.windows.onCreated', window);
+            loadConfig(function(){
+                toConsole('loadConfig initial', [configUrls, configDisplayTime, configReloadTime, configAutoLoad]);
+                if(configAutoLoad) {
+                    start();
+                }
+            });
+        });
+	});
 });
